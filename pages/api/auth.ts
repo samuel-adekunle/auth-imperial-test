@@ -2,8 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import axios from 'axios'
 
 // authICACS uses the Imperial College Student Union endpoint authenticate ICACS members.
-// `username` should be the student's shortcode, e.g. sja119.
-async function authICACS(username: string, password: string): Promise<boolean | null> {
+// `username` should be the student's shortcode, e.g. ab123.
+async function authICACSMember(username: string, password: string): Promise<boolean | null> {
   try {
     const res = await axios.post("https://eactivities.union.ic.ac.uk/user/login", { username, password }, {
       headers: {
@@ -18,8 +18,8 @@ async function authICACS(username: string, password: string): Promise<boolean | 
 }
 
 type Data = {
-  isStudent: boolean
-  isMember: boolean
+  isICStudent: boolean
+  isICACSMember: boolean
 }
 
 export default async function handler(
@@ -29,29 +29,29 @@ export default async function handler(
   const { username, password } = req.body
   if (!username || !password) {
     return res.status(400).json({
-      isStudent: false,
-      isMember: false
+      isICStudent: false,
+      isICACSMember: false
     })
   }
-  const authRes = await authICACS(username, password)
+  const authRes = await authICACSMember(username, password)
 
   switch (authRes) {
     case null:
       res.status(400).json({
-        isStudent: false,
-        isMember: false
+        isICStudent: false,
+        isICACSMember: false
       })
       break
     case false:
       res.status(401).json({
-        isStudent: true,
-        isMember: false
+        isICStudent: true,
+        isICACSMember: false
       })
       break
     case true:
       res.status(200).json({
-        isStudent: true,
-        isMember: true
+        isICStudent: true,
+        isICACSMember: true
       })
       break
   }
